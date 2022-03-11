@@ -408,7 +408,19 @@ class StatInterface(VltDevice.StatInterface):
     @NodeAlias.prop("enable_finished", nodes=["enabled", "check"])
     def enable_finished(self, enabled, c):
         return enabled
-
+    
+    _mot_positions = None# will be overwriten by Motor 
+    @NodeAlias1.prop("pos_name", node="pos_actual")
+    def pos_name(self, pos_actual):
+        if not self._mot_positions: return ''
+        positions = self._mot_positions
+        tol = positions.tolerance
+        for pname, pos in positions.positions.items():
+            if abs( pos-pos_actual)<tol:
+                return pname
+        return ''
+   
+    
     
     not_initialised = NegNode.prop("not_initialised", node="initialised")
 
@@ -621,9 +633,15 @@ class VltMotor(VltDevice):
         stat: StatData = StatData()
         cfg: CfgData = CfgData()
 
-    stat = StatInterface.prop('stat')
     cfg  = CfgInterface.prop('cfg')
     ctrl = CtrlInterface.prop('ctrl')
+
+    @StatInterface.prop('stat')    
+    def stat(self, interface):
+        # need to add the motor_position to the stat interface instance 
+        interface._mot_positions = self.config.positions
+        
+    
 
 
     def get_configuration(self, exclude_unset=True,  **kwargs) -> Dict[VltDevice.Node,Any]:
@@ -658,6 +676,10 @@ class VltMotor(VltDevice):
         # Set the new config value to the device 
         return cfg_dict
     
+    @property
+    def velocity(self) -> float:
+        return self.config.ctrl_config.velocity
+   
 
     def check(self):
         """Check if the device is in error. Raise an error in case it is True """
@@ -686,7 +708,9 @@ class VltMotor(VltDevice):
             })
         return self.stat.initialisation_finished
 
-    def move_abs(self, pos, vel):
+    def move_abs(self, pos, vel=None):
+        
+        vel = self.velocity if vel is None else vel
         upload({
             self.ctrl.execute : True, 
             self.ctrl.position: pos, 
@@ -695,7 +719,9 @@ class VltMotor(VltDevice):
             })
         return self.stat.movement_finished
 
-    def move_rel(self, pos, vel):
+    def move_rel(self, pos, vel=None):
+
+        vel = self.velocity if vel is None else vel
         upload({
             self.ctrl.execute : True, 
             self.ctrl.position: pos, 
@@ -714,6 +740,39 @@ class VltMotor(VltDevice):
             self.ctrl.command: self.COMMAND.MOVE_VELOCITY
             })
         return None
+    
+    def get_pos_target_of_name(self, name: str) -> float:
+        """return the configured target position of a given pos name or raise error"""
+        try:
+            position = getattr(self.config.positions, name)
+        except AttributeError:
+            raise ValueError('unknown posname %r'%name)
+        return position
+
+    def get_name_of_pos(self, pos_actual: float) -> str:
+        """ Retrun the name of a position from a position as input or ''
+        
+        Example:
+            m.get_name_of( m.stat.pos_actual.get() )
+        """
+        positions = self.config.positions    
+        tol = positions.tolerance
+        
+        for pname, pos in positions.positions.items():
+            if abs( pos-pos_actual)<tol:
+                return pname
+        return ''
+
+    def move_name(self, name, vel=None) -> VltDevice.Node:
+        """ move motor to a named position 
+        
+        Args:
+           name (str): named position
+           vel (float):   target velocity for the movement
+        """
+        absPos = self.get_pos_target_of_name(name)
+        return self.move_abs(absPos, vel)
+        
 
     def set_pos(self, pos):
         """ Set the curent position value """
