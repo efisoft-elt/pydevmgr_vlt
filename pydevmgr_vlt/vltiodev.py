@@ -4,7 +4,7 @@ from .vltdevice import VltDevice
 from pydevmgr_core import BaseParser, record_class, upload, NodeAlias, NodeVar
 from pydevmgr_ua import Int32
 from enum import Enum 
-from typing import Union, List, Dict
+from typing import Union, List, Dict, Iterable
 
 
 N_AI, N_DI, N_NI, N_TI  = [8]*4 
@@ -129,8 +129,16 @@ class VltIoDev(VltDevice):
     class Data(VltDevice.Data):
         StatData = StatInterface.Data
         stat: StatData = StatData()
-         
 
+
+    def init(self):
+        """ init the iodev  """
+        upload({
+            self.ctrl.execute: True, 
+            self.ctrl.command: self.COMMAND.INITIALISE
+            })
+        return self.stat.initialised
+    
     def set_do(self, flags: Union[List[bool], Dict[int,bool]]):
         """ set digital output flags 
         
@@ -179,9 +187,30 @@ class VltIoDev(VltDevice):
         upload(n_f)
     
 
+    def get_do_node(self, num: Union[int,Iterable]):
+        if hasattr(num, "__iter__"):
+            return [ self.ctrl.nodes[f'do_{n}'] for n in num]
+        else:
+            return self.ctrl.nodes[f'do_{num}']
 
+    def get_ao_node(self, num: Union[int,Iterable]):
+        if hasattr(num, "__iter__"):
+            return [ self.ctrl.nodes[f'ao_{n}'] for n in num]
+        else:
+            return self.ctrl.nodes[f'ao_{num}']
 
-        
+    def get_ai_node(self, num: Union[int,Iterable]):
+        if hasattr(num, "__iter__"):
+            return [ self.stat.nodes[f'ai_{n}'] for n in num]
+        else:
+            return self.stat.nodes[f'ai_{num}']
+     
+    def get_di_node(self, num: Union[int,Iterable]):
+        if hasattr(num, "__iter__"):
+            return [ self.stat.nodes[f'di_{n}'] for n in num]
+        else:
+            return self.stat.nodes[f'di_{num}']
+
 
         
             

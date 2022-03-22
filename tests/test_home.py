@@ -18,11 +18,7 @@ if __name__ == "__main__":
         m1.connect()
         m1.configure()
         
-        data = VltMotor.CfgInterface.Data()
-        dl = DataLink(m1.cfg, data)
-        dl.download()
-        print(data)
-
+  
         data = VltMotor.Data()
         dl = DataLink(m1, data)
         dl.download()
