@@ -5,8 +5,5 @@ from pydevmgr_ua import  (Int16, Int32, Int64, UInt16, UInt32, UInt64, Float, Do
                           INT  , DINT , LINT , UINT  , UDINT , ULINT  , REAL, LREAL)
 
 
-from .vltdevice import VltDevice
-from .vltmotor import VltMotor
-from .vltiodev import VltIoDev
-
-
+from .base.vltdevice import VltDevice
+from .devices import *

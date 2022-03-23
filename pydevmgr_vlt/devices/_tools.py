@@ -1,4 +1,5 @@
 from typing import Optional
+from pydevmgr_core import NodeAlias1
 
 _enum = -1 
 def _inc(i: Optional[int] = None) -> int:
@@ -11,3 +12,7 @@ def _inc(i: Optional[int] = None) -> int:
     _enum = _enum+1 if i is None else i
     return _enum
 
+
+class NegNode(NodeAlias1):
+    def fget(self, value):
+        return not value 

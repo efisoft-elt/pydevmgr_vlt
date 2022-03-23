@@ -18,6 +18,9 @@ class VltMotorCtrlStatData(VltDeviceCtrl.Data.StatData):
     pos_actual: NodeVar[float] = 0.0
     pos_target: NodeVar[float] = 0.0
     vel_actual: NodeVar[float] = 0.0
+    pos_name: NodeVar[str] = ""
+    state: NodeVar[int] = 0
+    state_txt : NodeVar[str] = ""
 
 ###
 # Example of use:
@@ -67,6 +70,8 @@ class VltMotorCtrl(VltDeviceCtrl):
         self.outputs.pos_target = self.outputs.Float(self.widget.pos_target, fmt="%.3f")
         self.outputs.vel_actual = self.outputs.Float(self.widget.vel_actual, fmt="%.3f")
         
+        self.outputs.pos_name = self.outputs.Str(self.widget.posname)
+        
         self.outputs.pos_error = self.outputs.Float(self.widget.pos_error, fmt="%.3f")
         self.outputs.state = self.outputs.Code(self.widget.state)
 
@@ -90,6 +95,8 @@ class VltMotorCtrl(VltDeviceCtrl):
         self.outputs.pos_error.set(stat.pos_actual - stat.pos_target)
         self.outputs.pos_target.set(stat.pos_target)
         self.outputs.vel_actual.set(stat.vel_actual)
+
+        self.outputs.pos_name.set(stat.pos_name)
     
     
     def setup_ui(self,motor, data):
@@ -126,7 +133,23 @@ class VltMotorCtrl(VltDeviceCtrl):
                       feedback = self.feedback
                       )
         move.connect_button(self.widget.move)
-    
+   
+        # A dropdown menu allows to move directly by position name 
+        wm = self.widget.move_by_posname
+        wm.clear()
+        wm.addItem('')
+        reset = lambda : wm.setCurrentIndex(0) # put always the first empty item after an action 
+        
+        for i,posname in enumerate(motor.config.positions.posnames, start=wm.count()):
+            action = self.actions.add( 
+                                       motor.move_name, [posname, self.inputs.velocity.get], 
+                                       after=reset, feedback = self.feedback
+                                    )
+            wm.addItem(posname)
+            action.connect_item(wm, i)
+
+
+
     def setup_actions(self, device, data):
         super().setup_actions(device, data)
         
