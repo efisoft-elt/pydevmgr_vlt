@@ -1,6 +1,7 @@
 
 from pydevmgr_ua import UaDevice 
-from pydevmgr_core import record_class, upload, LocalNode
+from pydevmgr_core import record_class, upload
+from pydevmgr_core.nodes import Local
 from .vltinterface import VltInterface
 
 
@@ -50,7 +51,7 @@ class VltDevice(UaDevice):
     Ctrl = CtrlInterface
 
     
-    is_ignored = LocalNode.prop(default=False)
+    is_ignored = Local.prop(default=False)
     
 
     def get_configuration(self, exclude_unset=True, **kwargs):

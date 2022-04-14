@@ -12,7 +12,3 @@ def _inc(i: Optional[int] = None) -> int:
     _enum = _enum+1 if i is None else i
     return _enum
 
-
-class NegNode(NodeAlias1):
-    def fget(self, value):
-        return not value 

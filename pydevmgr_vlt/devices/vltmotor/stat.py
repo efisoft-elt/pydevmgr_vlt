@@ -1,5 +1,6 @@
 from pydevmgr_vlt.base import VltDevice
-from pydevmgr_core import Defaults, NodeVar, NodeAlias, NodeAlias1, NegNode
+from pydevmgr_core import Defaults, NodeVar, NodeAlias, NodeAlias1
+from pydevmgr_core.nodes import Opposite
 from enum import Enum 
 from typing import Optional 
 from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
@@ -89,7 +90,7 @@ class VltMotorStat(Base):
     def enable_finished(self, enabled, c):
         return enabled
     
-    not_initialised = NegNode.prop(node="initialised")
+    not_initialised = Opposite.prop(node="initialised")
 
     @NodeAlias1.prop(node="pos_actual")
     def pos_name(self, pos_actual):
