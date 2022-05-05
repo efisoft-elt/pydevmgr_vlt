@@ -115,7 +115,7 @@ class VltMotor(Base):
         # one may need to check parse some variable more carefully       
         values = ctrl_config.dict(exclude_none=True, exclude_unset=exclude_unset)
         cfg_dict = {getattr(self.cfg, k):v for k,v in  values.items() }
-        cfg_dict[self.ignored] = self.config.ignored 
+        cfg_dict[self.is_ignored] = self.config.ignored 
         cfg_dict.update({getattr(self.cfg, k):v for k,v in  kwargs.items() })
         
         init_cfg = init_sequence_to_cfg(config.initialisation, self.Cfg.INITSEQ)
