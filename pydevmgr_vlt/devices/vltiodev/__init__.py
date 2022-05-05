@@ -52,7 +52,7 @@ class VltIoDev(Base):
         """ init the iodev  """
         upload({
             self.ctrl.execute: True, 
-            self.ctrl.command: self.COMMAND.INITIALISE
+            self.ctrl.command: self.ctrl.COMMAND.INITIALISE
             })
         return self.stat.initialised
     
@@ -76,7 +76,7 @@ class VltIoDev(Base):
         ctrl = self.ctrl 
         n_f = { ctrl.get_node( "do_{}".format(i) ):f for i,f in it }
         
-        n_f.update( {ctrl.execute:True, ctrl.command :self.COMMAND.ACTIVATE} )
+        n_f.update( {ctrl.execute:True, ctrl.command :self.ctrl.COMMAND.ACTIVATE} )
         upload(n_f)
     
     def set_ao(self, values: Union[List[bool], Dict[int,bool]]):
@@ -100,7 +100,7 @@ class VltIoDev(Base):
         ctrl = self.ctrl 
         n_f = { ctrl.get_node( "do_{}".format(i) ):f for i,f in it }
         
-        n_f.update( {ctrl.execute:True, ctrl.command :self.COMMAND.ACTIVATE} )
+        n_f.update( {ctrl.execute:True, ctrl.command :self.ctrl.COMMAND.ACTIVATE} )
         upload(n_f)
     
 

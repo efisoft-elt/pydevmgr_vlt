@@ -4,6 +4,7 @@ from pydevmgr_ua import Int32
 from enum import Enum 
 from typing import Optional 
 from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
+from pydevmgr_vlt.devices.vltmotor.init_seq import INITSEQ
 
 Base = VltDevice.Cfg
 
@@ -50,6 +51,7 @@ class AxisType(BaseParser):
 
 class VltMotorCfg(Base):
     AXIS_TYPE = AXIS_TYPE
+    INITSEQ = INITSEQ
     class Config(Base.Config):
         scale_factor:       ND  =  NC(  suffix=  'cfg.lrScaleFactor'                )
         accel:              ND  =  NC(  suffix=  'cfg.lrAccel'                      )
