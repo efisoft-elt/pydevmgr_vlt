@@ -74,7 +74,7 @@ class VltIoDev(Base):
             it = flags.items()
 
         ctrl = self.ctrl 
-        n_f = { ctrl.get_node( "do_{}".format(i) ):f for i,f in it }
+        n_f = { getattr(ctrl, "do_{}".format(i)):f for i,f in it }
         
         n_f.update( {ctrl.execute:True, ctrl.command :self.ctrl.COMMAND.ACTIVATE} )
         upload(n_f)
@@ -98,7 +98,7 @@ class VltIoDev(Base):
             it = values.items()
 
         ctrl = self.ctrl 
-        n_f = { ctrl.get_node( "do_{}".format(i) ):f for i,f in it }
+        n_f = { getattr(ctrl, "do_{}".format(i)):f for i,f in it }
         
         n_f.update( {ctrl.execute:True, ctrl.command :self.ctrl.COMMAND.ACTIVATE} )
         upload(n_f)
@@ -106,27 +106,27 @@ class VltIoDev(Base):
 
     def get_do_node(self, num: Union[int,Iterable]):
         if hasattr(num, "__iter__"):
-            return [ self.ctrl.nodes[f'do_{n}'] for n in num]
+            return [ getattr( self.ctrl, f'do_{n}') for n in num]
         else:
-            return self.ctrl.nodes[f'do_{num}']
+            return getattr( self.ctrl, f'do_{num}')
 
     def get_ao_node(self, num: Union[int,Iterable]):
         if hasattr(num, "__iter__"):
-            return [ self.ctrl.nodes[f'ao_{n}'] for n in num]
+            return [ getattr( self.ctrl, f'ao_{n}') for n in num]
         else:
-            return self.ctrl.nodes[f'ao_{num}']
+            return getattr( self.ctrl, f'ao_{num}')
 
     def get_ai_node(self, num: Union[int,Iterable]):
         if hasattr(num, "__iter__"):
-            return [ self.stat.nodes[f'ai_{n}'] for n in num]
+            return [ getattr(self.stat, f'ai_{n}') for n in num]
         else:
-            return self.stat.nodes[f'ai_{num}']
+            return getattr(self.stat, f'ai_{num}')
      
     def get_di_node(self, num: Union[int,Iterable]):
         if hasattr(num, "__iter__"):
-            return [ self.stat.nodes[f'di_{n}'] for n in num]
+            return [ getattr( self.stat, f'di_{n}') for n in num]
         else:
-            return self.stat.nodes[f'di_{num}']
+            return getattr( self.stat, f'di_{num}')
 
 if __name__ == "__main__":
     VltIoDev()
