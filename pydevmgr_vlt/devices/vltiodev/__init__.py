@@ -2,11 +2,13 @@ from pydevmgr_vlt.devices.vltiodev.stat import VltIoDevStat as Stat
 from pydevmgr_vlt.devices.vltiodev.ctrl  import VltIoDevCtrl as Ctrl
 
 from pydevmgr_vlt.base import VltDevice
-from pydevmgr_core import record_class, upload
+from pydevmgr_core import record_class, upload, BaseNodeAlias1
 from typing import Optional, Union, Iterable, Dict, List
 from pydantic import BaseModel
 
 Base = VltDevice
+
+
 
 
 class VltioDevCtrlConfig(BaseModel):
@@ -33,6 +35,45 @@ class VltioDevConfig(Base.Config):
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+@record_class
+class VltAiChannel(BaseNodeAlias1):
+    class Config(BaseNodeAlias1.Config):
+        type = "VltAiChannel"
+        channel_number: int = 0
+    @classmethod
+    def _new_source_node(cls, parent, config):
+        return getattr(parent.stat, f"ai_{config.channel_number}")
+    
+@record_class
+class VltDiChannel(BaseNodeAlias1):
+    class Config(BaseNodeAlias1.Config):
+        type = "VltDiChannel"
+        channel_number: int = 0
+    @classmethod
+    def _new_source_node(cls, parent, config):
+        return getattr(parent.stat, f"di_{config.channel_number}")
+
+@record_class
+class VltAoChannel(BaseNodeAlias1):
+    class Config(BaseNodeAlias1.Config):
+        type = "VltAoChannel"
+        channel_number: int = 0
+    @classmethod
+    def _new_source_node(cls, parent, config):
+        return getattr(parent.ctrl, f"ao_{config.channel_number}")
+    
+@record_class
+class VltDoChannel(BaseNodeAlias1):
+    class Config(BaseNodeAlias1.Config):
+        type = "VltDoChannel"
+        channel_number: int = 0
+    @classmethod
+    def _new_source_node(cls, parent, config):
+        return getattr(parent.ctrl, f"do_{config.channel_number}")
+
+
+
+
 
 @record_class
 class VltIoDev(Base):
@@ -41,6 +82,11 @@ class VltIoDev(Base):
     Ctrl = Ctrl
     Stat = Stat
     
+    AiChannel = VltAiChannel 
+    AoChannel = VltAoChannel 
+    DiChannel = VltDiChannel 
+    DoChannel = VltDoChannel 
+
     class Data(Base.Data):
         Ctrl = Ctrl.Data
         Stat = Stat.Data

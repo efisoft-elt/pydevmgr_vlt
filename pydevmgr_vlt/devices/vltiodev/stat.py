@@ -1,5 +1,6 @@
 
 from pydevmgr_core import  NodeAlias, Defaults, NodeVar
+from pydevmgr_core.base.class_recorder import record_class
 from pydevmgr_vlt.base import VltDevice
 from pydevmgr_vlt.devices._tools import _inc
 from pydevmgr_vlt.devices.vltiodev.ctrl import COMMAND
@@ -47,7 +48,6 @@ for i in range(N_NI):
     io_nodes[f'ni_{i}'] = (ND, NC(suffix= f'stat.arr_NI[{i}].nValue'))
 for i in range(N_TI):
     io_nodes[f'ti_{i}'] = (ND, NC(suffix= f'stat.arr_TI[{i}].sValue'))
-
 
 
 
