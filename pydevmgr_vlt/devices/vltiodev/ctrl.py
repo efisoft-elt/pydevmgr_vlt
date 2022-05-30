@@ -26,7 +26,7 @@ class IoDevCommand(BaseParser):
     class Config(BaseParser.Config):
         type = "IoDevCommand"
     @staticmethod
-    def parse(value, config):
+    def fparse(value, config):
         if isinstance(value, str):
             value =  getattr(COMMAND, value)
         return Int32(value)

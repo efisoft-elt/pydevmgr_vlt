@@ -43,7 +43,7 @@ class AxisType(BaseParser):
     class Config(BaseParser.Config):
         type: str = "AxisType"
     @staticmethod
-    def parse(value, config):
+    def fparse(value, config):
         return axis_type(value)   
 
 

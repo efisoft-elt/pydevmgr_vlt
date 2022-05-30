@@ -30,7 +30,7 @@ class MotorCommand(BaseParser):
     class Config(BaseParser.Config):
         type = "MotorCommand"
     @staticmethod
-    def parse(value, config):
+    def fparse(value, config):
         if isinstance(value, str):
             value =  getattr(MOTOR_COMMAND, value)
         return Int32(value)
@@ -47,7 +47,7 @@ class Direction(BaseParser):
     class Config(BaseParser.Config):
         type = "Direction"
     @staticmethod
-    def parse(value, config):
+    def fparse(value, config):
         if isinstance(value, str):
             value =  getattr(DIRECTION, value)
         return Int16(value)
