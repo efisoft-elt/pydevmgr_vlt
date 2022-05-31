@@ -1,6 +1,6 @@
 from pydevmgr_vlt.base import VltDevice
 from pydevmgr_core import Defaults, NodeVar,   record_class, BaseParser
-from pydevmgr_ua import Int32
+from pydevmgr_ua import UaInt32
 from enum import Enum 
 from typing import Optional 
 from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
@@ -13,6 +13,7 @@ NC = N.Config
 ND = Defaults[NC] # this typing var says that it is a Node object holding default values 
 NV = NodeVar # used in Data 
 
+to_int32 = UaInt32().parse
 
 
 class AXIS_TYPE(int, Enum):
@@ -35,7 +36,7 @@ def axis_type(axis_type):
             axis_type = getattr(AXIS_TYPE, axis_type) 
         except AttributeError:
             raise ValueError(f'Unknown AXIS type {axis_type!r}')
-    return Int32(axis_type)
+    return to_int32(axis_type)
 
 # a parser class for axis type
 @record_class

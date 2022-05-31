@@ -1,6 +1,6 @@
 from pydevmgr_vlt.base import VltDevice
 from pydevmgr_core import Defaults, NodeVar, NodeAlias, NodeAlias1, record_class, BaseParser
-from pydevmgr_ua import Int32, Int16
+from pydevmgr_ua import UaInt32, UaInt16
 from enum import Enum 
 from typing import Optional 
 from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
@@ -13,6 +13,8 @@ NC = N.Config
 ND = Defaults[NC] # this typing var says that it is a Node object holding default values 
 NV = NodeVar # used in Data 
 
+to_int16 = UaInt16().parse 
+to_int32 = UaInt32().parse
 
 class MOTOR_COMMAND(int, Enum):
     NONE = _inc(0)
@@ -33,7 +35,7 @@ class MotorCommand(BaseParser):
     def fparse(value, config):
         if isinstance(value, str):
             value =  getattr(MOTOR_COMMAND, value)
-        return Int32(value)
+        return to_int32(value)
 
 
 class DIRECTION(int, Enum):
@@ -50,7 +52,7 @@ class Direction(BaseParser):
     def fparse(value, config):
         if isinstance(value, str):
             value =  getattr(DIRECTION, value)
-        return Int16(value)
+        return to_int16(value)
 
 
 

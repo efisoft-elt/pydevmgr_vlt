@@ -1,7 +1,7 @@
 from pydevmgr_core import  NodeAlias1, Defaults, NodeVar, record_class, BaseParser
 from pydevmgr_vlt.base import VltDevice
 from pydevmgr_vlt.devices._tools import _inc
-from pydevmgr_ua import Int32
+from pydevmgr_ua import UaInt32
 from enum import Enum
 from pydantic import create_model
 Base = VltDevice.Ctrl
@@ -10,6 +10,8 @@ N = Base.Node # Base Node
 NC = N.Config
 ND = Defaults[NC] # this typing var says that it is a Node object holding default values 
 NV = NodeVar # used in Data 
+
+to_int32 = UaInt32().parse
 
 class COMMAND(int, Enum):
     NONE = 0
@@ -29,7 +31,7 @@ class IoDevCommand(BaseParser):
     def fparse(value, config):
         if isinstance(value, str):
             value =  getattr(COMMAND, value)
-        return Int32(value)
+        return to_int32(value)
 
 
 
