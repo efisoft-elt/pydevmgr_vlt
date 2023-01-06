@@ -3,8 +3,6 @@ from pydevmgr_core import  NodeVar
 from pydevmgr_ua import UaInt32
 from valueparser import BaseParser
 from enum import Enum 
-from typing import Optional 
-from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
 from pydevmgr_vlt.devices.vltmotor.init_seq import INITSEQ
 
 Base = VltDevice.Cfg
