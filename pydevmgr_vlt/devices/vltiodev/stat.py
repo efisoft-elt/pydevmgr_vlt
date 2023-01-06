@@ -1,8 +1,6 @@
 
-from pydevmgr_core import  NodeAlias, Defaults, NodeVar
-from pydevmgr_core.base.class_recorder import record_class
+from pydevmgr_core import  NodeAlias, Defaults, NodeVar, nodealias
 from pydevmgr_vlt.base import VltDevice
-from pydevmgr_vlt.devices._tools import _inc
 from pydevmgr_vlt.devices.vltiodev.ctrl import COMMAND
 from pydantic import create_model 
 
@@ -61,16 +59,16 @@ class VltIoDevStat(Base):
         error_text: ND = NC( suffix= 'stat.sErrorText' )
         status: ND = NC( suffix= 'stat.nStatus' )
     
-    @NodeAlias.prop( nodes=[f'di_{i}' for i in range(N_DI) ] )
+    @nodealias( *[f'di_{i}' for i in range(N_DI) ] )
     def di_all(self, *flags):
         return flags
-    @NodeAlias.prop( nodes=[f'ai_{i}' for i in range(N_AI)] )
+    @nodealias( *[f'ai_{i}' for i in range(N_AI)] )
     def ai_all(self, *values):
         return values
-    @NodeAlias.prop( nodes=[f'ni_{i}' for i in range(N_NI)] )
+    @nodealias( *[f'ni_{i}' for i in range(N_NI)] )
     def ni_all(self, *values):
         return values
-    @NodeAlias.prop( nodes=[f'ti_{i}' for i in range(N_TI)] )
+    @nodealias( *[f'ti_{i}' for i in range(N_TI)] )
     def ti_all(self, *values):
         return values
 

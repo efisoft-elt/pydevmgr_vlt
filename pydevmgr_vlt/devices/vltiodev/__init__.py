@@ -1,9 +1,10 @@
+from enum import Enum
 from pydevmgr_vlt.devices.vltiodev.stat import VltIoDevStat as Stat
 from pydevmgr_vlt.devices.vltiodev.ctrl  import VltIoDevCtrl as Ctrl
 
-from pydevmgr_vlt.base import VltDevice
-from pydevmgr_core import record_class, upload, BaseNodeAlias1
-from typing import Optional, Union, Iterable, Dict, List
+from pydevmgr_vlt.base import VltDevice, register
+from pydevmgr_core import upload, BaseNodeAlias1, ParentWeakRef
+from typing import Callable, Optional, Union, Iterable, Dict, List
 from pydantic import BaseModel
 
 Base = VltDevice
@@ -11,22 +12,15 @@ Base = VltDevice
 
 
 
-class VltioDevCtrlConfig(BaseModel):
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Data Structure (on top of CtrlConfig)
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pass
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
 class VltioDevConfig(Base.Config):
-    CtrlConfig = VltioDevCtrlConfig
+    class CtrlConfig(Base.Config.CtrlConfig):
+        pass
     
     Ctrl = Ctrl.Config
     Stat = Stat.Config
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Data Structure (redefine the ctrl_config)
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    type: str = "VltioDev"
     ctrl_config : CtrlConfig= CtrlConfig()
     
     ctrl: Ctrl = Ctrl()
@@ -34,48 +28,56 @@ class VltioDevConfig(Base.Config):
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+class ChannelType(str, Enum):
+    AI = "ai"
+    DI = "di"
+    AO = "ao"
+    DO = "do"
 
-@record_class
-class VltAiChannel(BaseNodeAlias1):
-    class Config(BaseNodeAlias1.Config):
-        type = "VltAiChannel"
+@register
+class VltChannel(ParentWeakRef, BaseNodeAlias1):
+    class Config:
         channel_number: int = 0
-    @classmethod
-    def _new_source_node(cls, parent, config):
-        return getattr(parent.stat, f"ai_{config.channel_number}")
+        channel_type: ChannelType = ChannelType.AI
     
-@record_class
-class VltDiChannel(BaseNodeAlias1):
-    class Config(BaseNodeAlias1.Config):
-        type = "VltDiChannel"
+    def nodes(self):
+        ch_type = self.channel_type.value 
+        if ch_type.value.endswith("o"):
+            interface = self.get_parent().ctrl
+        else:
+            interface = self.get_parent().stat 
+        yield getattr( interface, f"{ch_type}_{self.channel_number}")
+   
+@register
+class VltAiChannel(ParentWeakRef, BaseNodeAlias1):
+    class Config:
         channel_number: int = 0
-    @classmethod
-    def _new_source_node(cls, parent, config):
-        return getattr(parent.stat, f"di_{config.channel_number}")
+    def nodes(self):
+        yield getattr( self.get_parent().stat,  f"ai_{self.channel_number}")   
+        
+@register
+class VltDiChannel(ParentWeakRef, BaseNodeAlias1):
+    class Config:
+        channel_number: int = 0
+    def nodes(self):
+        yield getattr( self.get_parent().stat,  f"di_{self.channel_number}")   
 
-@record_class
-class VltAoChannel(BaseNodeAlias1):
-    class Config(BaseNodeAlias1.Config):
-        type = "VltAoChannel"
+@register
+class VltAoChannel(ParentWeakRef, BaseNodeAlias1):
+    class Config:
         channel_number: int = 0
-    @classmethod
-    def _new_source_node(cls, parent, config):
-        return getattr(parent.ctrl, f"ao_{config.channel_number}")
+    def nodes(self):
+        yield getattr( self.get_parent().ctrl,  f"ao_{self.channel_number}")   
     
-@record_class
-class VltDoChannel(BaseNodeAlias1):
-    class Config(BaseNodeAlias1.Config):
-        type = "VltDoChannel"
+@register
+class VltDoChannel(ParentWeakRef, BaseNodeAlias1):
+    class Config:
         channel_number: int = 0
-    @classmethod
-    def _new_source_node(cls, parent, config):
-        return getattr(parent.ctrl, f"do_{config.channel_number}")
+    def nodes(self):
+        yield getattr( self.get_parent().ctrl,  f"do_{self.channel_number}")   
 
 
-
-
-
-@record_class
+@register
 class VltIoDev(Base):
     """ ELt Standard VltioDev device """
     Config = VltioDevConfig
@@ -144,7 +146,7 @@ class VltIoDev(Base):
             it = values.items()
 
         ctrl = self.ctrl 
-        n_f = { getattr(ctrl, "do_{}".format(i)):f for i,f in it }
+        n_f = { getattr(ctrl, "ao_{}".format(i)):f for i,f in it }
         
         n_f.update( {ctrl.execute:True, ctrl.command :self.ctrl.COMMAND.ACTIVATE} )
         upload(n_f)

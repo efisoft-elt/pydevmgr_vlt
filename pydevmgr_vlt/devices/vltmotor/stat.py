@@ -1,5 +1,5 @@
 from pydevmgr_vlt.base import VltDevice
-from pydevmgr_core import Defaults, NodeVar, NodeAlias, NodeAlias1
+from pydevmgr_core import Defaults, NodeVar,  nodealias
 from pydevmgr_core.nodes import Opposite
 from enum import Enum 
 from typing import Optional 
@@ -67,32 +67,32 @@ class VltMotorStat(Base):
         changing_vel:           ND  =  NC(suffix='stat.bChangingVel'          )
         
 
-    @NodeAlias.prop("check", nodes=["error_code", "error_text"])
+    @nodealias("error_code", "error_text")
     def check(self, erc, ert):
         """ This node always return True but raise an error in case of device in error """
         if erc:
             raise RuntimeError(f"Error {erc}: {ert}")
         return True
 
-    @NodeAlias1.prop( node="state")
+    @nodealias("state")
     def state_txt(self, state):
         return self.STATE(state).name 
 
-    @NodeAlias.prop( nodes=["state", "check"])
+    @nodealias("state", "check")
     def movement_finished(self, state, c):
         return state not in [self.STATE.MOVE_ABS, self.STATE.MOVE_OPTIMISED, self.STATE.MOVE_VEL, self.STATE.INIT]
 
-    @NodeAlias.prop( nodes=["initialised", "check"])
+    @nodealias( "initialised", "check")
     def initialisation_finished(self, initialised, c):
         return initialised
 
-    @NodeAlias.prop( nodes=["enabled", "check"])
+    @nodealias( "enabled", "check")
     def enable_finished(self, enabled, c):
         return enabled
     
-    not_initialised = Opposite.prop(node="initialised")
+    not_initialised = Opposite.Config(node="initialised")
 
-    @NodeAlias1.prop(node="pos_actual")
+    @nodealias("pos_actual")
     def pos_name(self, pos_actual):
         if not self.config.mot_positions: return ''
         positions = self.config.mot_positions

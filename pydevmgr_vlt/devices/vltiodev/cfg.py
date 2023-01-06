@@ -1,4 +1,4 @@
-from pydevmgr_core import  NodeAlias1, Defaults, NodeVar, record_class, BaseParser
+from pydevmgr_core import  NodeAlias1, Defaults, NodeVar
 from pydevmgr_vlt.base import VltDevice
 from pydevmgr_vlt.devices._tools import _inc
 
@@ -12,8 +12,5 @@ NV = NodeVar # used in Data
 
 
 class VltioDevCfg(Base):
-    class Config(Base.Config):
-        pass    
-    class Data(Base.Data):
-        pass           
+    pass
 

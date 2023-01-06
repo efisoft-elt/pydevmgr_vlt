@@ -1,6 +1,7 @@
-from pydevmgr_vlt.base import VltDevice
-from pydevmgr_core import Defaults, NodeVar, NodeAlias, NodeAlias1, record_class, BaseParser
+from pydevmgr_vlt.base import VltDevice, register
+from pydevmgr_core import  NodeVar
 from pydevmgr_ua import UaInt32, UaInt16
+from valueparser import BaseParser
 from enum import Enum 
 from typing import Optional 
 from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
@@ -10,7 +11,6 @@ Base = VltDevice.Ctrl
 
 N = Base.Node # Base Node
 NC = N.Config
-ND = Defaults[NC] # this typing var says that it is a Node object holding default values 
 NV = NodeVar # used in Data 
 
 to_int16 = UaInt16().parse 
@@ -27,12 +27,10 @@ class MOTOR_COMMAND(int, Enum):
     NEW_POSITION = _inc()
     CLEAR_NOVRAM = _inc()
 
-@record_class
+@register
 class MotorCommand(BaseParser):
-    class Config(BaseParser.Config):
-        type = "MotorCommand"
     @staticmethod
-    def fparse(value, config):
+    def __parse__(value, config):
         if isinstance(value, str):
             value =  getattr(MOTOR_COMMAND, value)
         return to_int32(value)
@@ -44,12 +42,10 @@ class DIRECTION(int, Enum):
     NEGATIVE = _inc()
     CURRENT  = _inc()
 
-@record_class
+@register
 class Direction(BaseParser):
-    class Config(BaseParser.Config):
-        type = "Direction"
     @staticmethod
-    def fparse(value, config):
+    def __parse__(value, config):
         if isinstance(value, str):
             value =  getattr(DIRECTION, value)
         return to_int16(value)
@@ -63,15 +59,15 @@ class VltMotorCtrl(Base):
     DIRECTION = DIRECTION
     
     class Config(Base.Config):
-        command:    ND  =  NC(  suffix=  'ctrl.nCommand',     parser=  MotorCommand  )
-        direction:  ND  =  NC(  suffix=  'ctrl.nDirection',   parser=  Direction     )
-        position:   ND  =  NC(  suffix=  'ctrl.lrPosition',   parser=  'UaDouble'    )
-        velocity:   ND  =  NC(  suffix=  'ctrl.lrVelocity',   parser=  'UaDouble'    )
-        stop:       ND  =  NC(  suffix=  'ctrl.bStop',        parser=  bool          )
-        reset:      ND  =  NC(  suffix=  'ctrl.bResetError',  parser=  bool          )
-        disable:    ND  =  NC(  suffix=  'ctrl.bDisable',     parser=  bool          )
-        enable:     ND  =  NC(  suffix=  'ctrl.bEnable',      parser=  bool          )
-        execute:    ND  =  NC(  suffix=  'ctrl.bExecute',     parser=  bool          )
+        command:    NC  =  NC(  suffix=  'ctrl.nCommand',     parser=  MotorCommand  )
+        direction:  NC  =  NC(  suffix=  'ctrl.nDirection',   parser=  Direction     )
+        position:   NC  =  NC(  suffix=  'ctrl.lrPosition',   parser=  'UaDouble'    )
+        velocity:   NC  =  NC(  suffix=  'ctrl.lrVelocity',   parser=  'UaDouble'    )
+        stop:       NC  =  NC(  suffix=  'ctrl.bStop',        parser=  bool          )
+        reset:      NC  =  NC(  suffix=  'ctrl.bResetError',  parser=  bool          )
+        disable:    NC  =  NC(  suffix=  'ctrl.bDisable',     parser=  bool          )
+        enable:     NC  =  NC(  suffix=  'ctrl.bEnable',      parser=  bool          )
+        execute:    NC  =  NC(  suffix=  'ctrl.bExecute',     parser=  bool          )
 
     class Data(Base.Data):
         pass # empty for ctr TODO: add data for ctrl ? 

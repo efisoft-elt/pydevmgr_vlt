@@ -5,7 +5,7 @@ from pydevmgr_vlt.devices.vltmotor.init_seq import INITSEQ, InitialisationConfig
 from pydevmgr_vlt.devices.vltmotor.positions import  PositionsConfig
 
 
-from pydevmgr_vlt.base import VltDevice
+from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_core import upload 
 from typing import Optional , Union , Dict, Any
 from pydantic import BaseModel, validator
@@ -78,10 +78,9 @@ class VltMotorConfig(Base.Config):
     ctrl_config    : CtrlConfig = CtrlConfig()
 
 
-
+@register
 class VltMotor(Base):
     Config = VltMotorConfig
-    
 
     Cfg  = Cfg 
     Stat = Stat

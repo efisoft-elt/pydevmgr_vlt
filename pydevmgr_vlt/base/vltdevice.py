@@ -1,9 +1,9 @@
 
 from pydevmgr_ua import UaDevice 
-from pydevmgr_core import record_class, upload
+from pydevmgr_core import register, upload
 from pydevmgr_core.nodes import Local
 from .vltinterface import VltInterface
-
+from pydantic import BaseModel
 
 
 
@@ -14,23 +14,21 @@ class CfgInterface(VltInterface):
 class CtrlInterface(VltInterface):
     pass
 
+class CtrlConfig(BaseModel):
+    pass
 
-
-
-
-
-@record_class
+@register
 class VltDevice(UaDevice):
     Node = VltInterface.Node
     Interface = VltInterface
-    
+     
     class Config(UaDevice.Config):
         Stat = StatInterface.Config
         Cfg = CfgInterface.Config
         Ctrl = CtrlInterface.Config 
+        CtrlConfig = CtrlConfig
         
-
-        type = "VLT"
+        ctrl_config = CtrlConfig()
         ignored : bool = False
         stat: Stat = Stat()
         cfg: Cfg = Cfg()
@@ -38,12 +36,12 @@ class VltDevice(UaDevice):
     
     class Data(UaDevice.Data):
         Stat = StatInterface.Data 
-        Cfg = CfgInterface.Config
-        Ctrl = CtrlInterface.Config 
+        Cfg = CfgInterface.Data
+        Ctrl = CtrlInterface.Data
+        
         stat: Stat = Stat()
         cfg: Cfg = Cfg()
         ctrl: Ctrl = Ctrl()
-
 
 
     Stat = StatInterface
@@ -51,7 +49,7 @@ class VltDevice(UaDevice):
     Ctrl = CtrlInterface
 
     
-    is_ignored = Local.prop(default=False)
+    is_ignored = Local.Config(default=False)
     
 
     def get_configuration(self, exclude_unset=True, **kwargs):
@@ -77,7 +75,7 @@ class VltDevice(UaDevice):
         # get values from the ctrl_config Config Model
         # do not include the default values, if they were unset, the PLC will use the default ones
         values = self.config.ctrl_config.dict(exclude_none=True, exclude_unset=exclude_unset)
-        cfg_dict = { getattr(self.cfg, k):v for k,v in values.items()}
+        cfg_dict = {getattr(self.cfg, k):v for k,v in values.items()}
         cfg_dict[self.ignored] = self.config.ignored 
         cfg_dict.update({ getattr( self.cfg , k):v for k,v in kwargs.items()})
         return cfg_dict

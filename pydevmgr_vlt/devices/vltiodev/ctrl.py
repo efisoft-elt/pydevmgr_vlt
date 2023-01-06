@@ -1,5 +1,6 @@
-from pydevmgr_core import  NodeAlias1, Defaults, NodeVar, record_class, BaseParser
-from pydevmgr_vlt.base import VltDevice
+from pydevmgr_core import  NodeAlias1, Defaults, NodeVar
+from valueparser import BaseParser
+from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_vlt.devices._tools import _inc
 from pydevmgr_ua import UaInt32
 from enum import Enum
@@ -8,7 +9,6 @@ Base = VltDevice.Ctrl
 
 N = Base.Node # Base Node
 NC = N.Config
-ND = Defaults[NC] # this typing var says that it is a Node object holding default values 
 NV = NodeVar # used in Data 
 
 to_int32 = UaInt32().parse
@@ -23,41 +23,37 @@ N_AO, N_DO, N_NO, N_TO  = [8]*4
 
 
 
-@record_class
+@register
 class IoDevCommand(BaseParser):
-    class Config(BaseParser.Config):
-        type = "IoDevCommand"
     @staticmethod
-    def fparse(value, config):
+    def __parse__(value, config):
         if isinstance(value, str):
             value =  getattr(COMMAND, value)
         return to_int32(value)
 
 
-
 # some dinamicaly created nodes
 io_nodes = {}
 for i in range(N_DO):
-    io_nodes[f'do_{i}'] = (ND, NC(suffix= f'ctrl.arr_DO[{i}].bValue'))
+    io_nodes[f'do_{i}'] = (NC, NC(suffix= f'ctrl.arr_DO[{i}].bValue'))
 for i in range(N_AO):
-    io_nodes[f'ao_{i}'] = (ND, NC(suffix= f'ctrl.arr_AO[{i}].lrValue'))
+    io_nodes[f'ao_{i}'] = (NC, NC(suffix= f'ctrl.arr_AO[{i}].lrValue'))
 for i in range(N_NO):
-    io_nodes[f'no_{i}'] = (ND, NC(suffix= f'ctrl.arr_NO[{i}].nValue'))
+    io_nodes[f'no_{i}'] = (NC, NC(suffix= f'ctrl.arr_NO[{i}].nValue'))
 for i in range(N_TO):
-    io_nodes[f'to_{i}'] = (ND, NC(suffix= f'ctrl.arr_TO[{i}].sValue'))
+    io_nodes[f'to_{i}'] = (NC, NC(suffix= f'ctrl.arr_TO[{i}].sValue'))
 
 
 
 class VltIoDevCtrl(Base):
     COMMAND = COMMAND
     class Config(create_model("Config",  __base__ = Base.Config, **io_nodes)):
-        execute: ND = NC(suffix= 'ctrl.bExecute', parser= 'bool' )
-        command: ND = NC(suffix= 'ctrl.nCommand', parser= 'IoDevCommand' )
+        execute: NC = NC(suffix= 'ctrl.bExecute', parser= 'bool' )
+        command: NC = NC(suffix= 'ctrl.nCommand', parser= 'IoDevCommand' )
         
-    class Data(Base.Data):
-        pass          
 
 if __name__ == "__main__":
-    VltIoDevCtrl()
+    ctrl = VltIoDevCtrl()
+    ctrl.do_3
     print("OK")
 

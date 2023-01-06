@@ -14,9 +14,8 @@ def test_custom_channel():
             intensity = VltIoDev.AoChannel.Config( channel_number = 3)
 
     my_sensor = MySensor()
-    
-    assert my_sensor.temp.node == my_sensor.stat.ai_3
-    assert my_sensor.interlock.node == my_sensor.stat.di_3
-    assert my_sensor.switch.node == my_sensor.ctrl.do_3
-    assert my_sensor.intensity.node  == my_sensor.ctrl.ao_3
+    assert list(my_sensor.temp.nodes())[0] == my_sensor.stat.ai_3
+    assert list(my_sensor.interlock.nodes())[0] == my_sensor.stat.di_3
+    assert list(my_sensor.switch.nodes())[0] == my_sensor.ctrl.do_3
+    assert list(my_sensor.intensity.nodes())[0]  == my_sensor.ctrl.ao_3
 
