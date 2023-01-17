@@ -1,4 +1,6 @@
 from enum import Enum
+
+from pydevmgr_core.base.dataclass import set_data_model
 from pydevmgr_vlt.devices.vltiodev.stat import VltIoDevStat as Stat
 from pydevmgr_vlt.devices.vltiodev.ctrl  import VltIoDevCtrl as Ctrl
 
@@ -76,7 +78,7 @@ class VltDoChannel(ParentWeakRef, BaseNodeAlias1):
     def nodes(self):
         yield getattr( self.get_parent().ctrl,  f"do_{self.channel_number}")   
 
-
+@set_data_model
 @register
 class VltIoDev(Base):
     """ ELt Standard VltioDev device """
@@ -88,13 +90,6 @@ class VltIoDev(Base):
     AoChannel = VltAoChannel 
     DiChannel = VltDiChannel 
     DoChannel = VltDoChannel 
-
-    class Data(Base.Data):
-        Ctrl = Ctrl.Data
-        Stat = Stat.Data
-        
-        ctrl: Ctrl = Ctrl()
-        stat: Stat = Stat()
     
     def init(self):
         """ init the iodev  """

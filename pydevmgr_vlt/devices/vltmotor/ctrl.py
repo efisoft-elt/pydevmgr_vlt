@@ -1,3 +1,4 @@
+from pydevmgr_core.base.dataclass import set_data_model
 from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_core import  NodeVar
 from pydevmgr_ua import UaInt32, UaInt16
@@ -42,36 +43,23 @@ class DIRECTION(int, Enum):
     NEGATIVE = _inc()
     CURRENT  = _inc()
 
-@register
-class Direction(BaseParser):
-    @staticmethod
-    def __parse__(value, config):
-        if isinstance(value, str):
-            value =  getattr(DIRECTION, value)
-        return to_int16(value)
 
 
-
-
-
+@set_data_model
 class VltMotorCtrl(Base):
     COMMAND = MOTOR_COMMAND
     DIRECTION = DIRECTION
     
     class Config(Base.Config):
-        command:    NC  =  NC(  suffix=  'ctrl.nCommand',     parser=  MotorCommand  )
-        direction:  NC  =  NC(  suffix=  'ctrl.nDirection',   parser=  Direction     )
-        position:   NC  =  NC(  suffix=  'ctrl.lrPosition',   parser=  'UaDouble'    )
-        velocity:   NC  =  NC(  suffix=  'ctrl.lrVelocity',   parser=  'UaDouble'    )
-        stop:       NC  =  NC(  suffix=  'ctrl.bStop',        parser=  bool          )
-        reset:      NC  =  NC(  suffix=  'ctrl.bResetError',  parser=  bool          )
-        disable:    NC  =  NC(  suffix=  'ctrl.bDisable',     parser=  bool          )
-        enable:     NC  =  NC(  suffix=  'ctrl.bEnable',      parser=  bool          )
-        execute:    NC  =  NC(  suffix=  'ctrl.bExecute',     parser=  bool          )
-
-    class Data(Base.Data):
-        pass # empty for ctr TODO: add data for ctrl ? 
-   
+        command:    NC  =  NC(  suffix=  'ctrl.nCommand',  vtype=int,   parser=  MotorCommand  )
+        direction:  NC  =  NC(  suffix=  'ctrl.nDirection',vtype=(DIRECTION, DIRECTION.POSITIVE),   parser=DIRECTION     )
+        position:   NC  =  NC(  suffix=  'ctrl.lrPosition',  vtype=float,  parser=  'UaDouble'   )
+        velocity:   NC  =  NC(  suffix=  'ctrl.lrVelocity',  vtype=float, parser=  'UaDouble'    )
+        stop:       NC  =  NC(  suffix=  'ctrl.bStop',        vtype=bool, parser=  bool          )
+        reset:      NC  =  NC(  suffix=  'ctrl.bResetError',  vtype=bool, parser=  bool          )
+        disable:    NC  =  NC(  suffix=  'ctrl.bDisable',     vtype=bool, parser=  bool          )
+        enable:     NC  =  NC(  suffix=  'ctrl.bEnable',      vtype=bool, parser=  bool          )
+        execute:    NC  =  NC(  suffix=  'ctrl.bExecute',     vtype=bool, parser=  bool          )
 
 if __name__=="__main__":
     VltMotorCtrl()

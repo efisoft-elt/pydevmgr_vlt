@@ -1,3 +1,4 @@
+from pydevmgr_core.base.dataclass import set_data_model
 from pydevmgr_vlt.devices.vltmotor.stat import VltMotorStat as Stat
 from pydevmgr_vlt.devices.vltmotor.cfg import VltMotorCfg as Cfg, AXIS_TYPE
 from pydevmgr_vlt.devices.vltmotor.ctrl import VltMotorCtrl as Ctrl
@@ -79,6 +80,7 @@ class VltMotorConfig(Base.Config):
 
 
 @register
+@set_data_model
 class VltMotor(Base):
     Config = VltMotorConfig
 
@@ -86,15 +88,6 @@ class VltMotor(Base):
     Stat = Stat
     Ctrl = Ctrl
     
-    class Data(Base.Data):
-        Stat = Stat.Data
-        Cfg = Cfg.Data
-        Ctrl = Ctrl.Data
-        
-        stat: Stat = Stat()
-        cfg: Cfg = Cfg()
-        ctrl: Ctrl = Ctrl()
-        
 
     def get_configuration(self, exclude_unset=True,  **kwargs) -> Dict[VltDevice.Node,Any]:
         """  return a node/value pair dictionary ready to be uploaded 
@@ -240,5 +233,5 @@ class VltMotor(Base):
 
 
 if __name__=="__main__":
-    VltMotor()
+    VltMotor().stat
     print("OK")

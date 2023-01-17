@@ -1,4 +1,5 @@
 from pydevmgr_core import  NodeAlias1, Defaults, NodeVar
+from pydevmgr_core.base.dataclass import set_data_model
 from valueparser import BaseParser
 from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_vlt.devices._tools import _inc
@@ -35,25 +36,26 @@ class IoDevCommand(BaseParser):
 # some dinamicaly created nodes
 io_nodes = {}
 for i in range(N_DO):
-    io_nodes[f'do_{i}'] = (NC, NC(suffix= f'ctrl.arr_DO[{i}].bValue'))
+    io_nodes[f'do_{i}'] = (NC, NC(suffix= f'ctrl.arr_DO[{i}].bValue', vtype=bool))
 for i in range(N_AO):
-    io_nodes[f'ao_{i}'] = (NC, NC(suffix= f'ctrl.arr_AO[{i}].lrValue'))
+    io_nodes[f'ao_{i}'] = (NC, NC(suffix= f'ctrl.arr_AO[{i}].lrValue', vtype=float))
 for i in range(N_NO):
-    io_nodes[f'no_{i}'] = (NC, NC(suffix= f'ctrl.arr_NO[{i}].nValue'))
+    io_nodes[f'no_{i}'] = (NC, NC(suffix= f'ctrl.arr_NO[{i}].nValue', vtype=int))
 for i in range(N_TO):
-    io_nodes[f'to_{i}'] = (NC, NC(suffix= f'ctrl.arr_TO[{i}].sValue'))
+    io_nodes[f'to_{i}'] = (NC, NC(suffix= f'ctrl.arr_TO[{i}].sValue', vtype=str))
 
 
-
+@set_data_model
 class VltIoDevCtrl(Base):
     COMMAND = COMMAND
     class Config(create_model("Config",  __base__ = Base.Config, **io_nodes)):
-        execute: NC = NC(suffix= 'ctrl.bExecute', parser= 'bool' )
-        command: NC = NC(suffix= 'ctrl.nCommand', parser= 'IoDevCommand' )
+        execute: NC = NC(suffix= 'ctrl.bExecute', parser= 'bool', vtype=bool )
+        command: NC = NC(suffix= 'ctrl.nCommand', parser= COMMAND, vtype=(COMMAND, COMMAND.NONE), output_parser=COMMAND )
         
 
 if __name__ == "__main__":
     ctrl = VltIoDevCtrl()
     ctrl.do_3
+    print( ctrl.Data() )
     print("OK")
 
