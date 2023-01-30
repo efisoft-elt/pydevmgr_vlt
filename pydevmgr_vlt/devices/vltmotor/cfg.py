@@ -2,7 +2,7 @@ from pydevmgr_core.base.dataclass import set_data_model
 from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_core import  NodeVar
 from pydevmgr_ua import UaInt32
-from valueparser import BaseParser
+from valueparser import Parser
 from enum import Enum 
 from pydevmgr_vlt.devices.vltmotor.init_seq import INITSEQ
 
@@ -39,7 +39,7 @@ def axis_type(axis_type):
 
 # a parser class for axis type
 @register
-class AxisType(BaseParser):
+class AxisType(Parser):
     @staticmethod
     def __parse__(value, config):
         return axis_type(value)   

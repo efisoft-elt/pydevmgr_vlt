@@ -1,6 +1,6 @@
 from pydevmgr_core import  NodeAlias1, Defaults, NodeVar
 from pydevmgr_core.base.dataclass import set_data_model
-from valueparser import BaseParser
+from valueparser import Parser
 from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_vlt.devices._tools import _inc
 from pydevmgr_ua import UaInt32
@@ -25,7 +25,7 @@ N_AO, N_DO, N_NO, N_TO  = [8]*4
 
 
 @register
-class IoDevCommand(BaseParser):
+class IoDevCommand(Parser):
     @staticmethod
     def __parse__(value, config):
         if isinstance(value, str):

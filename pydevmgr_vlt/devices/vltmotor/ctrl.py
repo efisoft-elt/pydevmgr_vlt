@@ -2,7 +2,7 @@ from pydevmgr_core.base.dataclass import set_data_model
 from pydevmgr_vlt.base import VltDevice, register
 from pydevmgr_core import  NodeVar
 from pydevmgr_ua import UaInt32, UaInt16
-from valueparser import BaseParser
+from valueparser import Parser
 from enum import Enum 
 from typing import Optional 
 from pydevmgr_vlt.devices.vltmotor.positions import PositionsConfig
@@ -29,7 +29,7 @@ class MOTOR_COMMAND(int, Enum):
     CLEAR_NOVRAM = _inc()
 
 @register
-class MotorCommand(BaseParser):
+class MotorCommand(Parser):
     @staticmethod
     def __parse__(value, config):
         if isinstance(value, str):
